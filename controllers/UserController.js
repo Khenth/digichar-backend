@@ -1,5 +1,8 @@
 const User = require('../models/User')
 
+
+
+
 // show the list of user
 const index = (req,res,next)=>{
     User.find()

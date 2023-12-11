@@ -1,5 +1,6 @@
-const mongoose   =require('mongoose')
-const Schema = new mongoose.Schema
+const {Schema, model} = require('mongoose');
+
+const UserSchema = Schema
 
 ({
     Username:{
@@ -15,21 +16,31 @@ const Schema = new mongoose.Schema
 
     Image:{
         type: String,
+        default:null,
+
     },
 
     Genre:{
         type: String,
+        default:null,
+
     },
 
-    Date_Naissance:{
-        type: Date,
-    },
-
-    Role:{
-        type: String,
-    },
+    authTokens:[{
+        authToken:{
+            type:String,
+            required:true
+        }
+     }],
+ 
 
   
 },  {timeStamps:true})
 
-module.exports = mongoose.model('User', Schema)
+UserSchema.methods.toJSON = function(){
+    const {__v,_id, authTokens, Password,...user} = this.toObject();
+    user.uid = _id;
+    return user;
+}
+
+module.exports = model('User', UserSchema)

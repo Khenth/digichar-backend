@@ -3,7 +3,15 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
 
-const register =(req,res,next)=>{
+
+const register =async (req,res,next)=>{
+
+    const exist = await User.findOne({Email: req.body.Email})
+
+    if(exist != null)  return res.status(400).json({
+        msg: "Email already exists"
+    })
+
     bcrypt.hash(req.body.Password,10,function(err,hashedPass){
         if(err){
             res.json({
@@ -14,21 +22,25 @@ const register =(req,res,next)=>{
             Username: req.body.Username,
             Email: req.body.Email,
             Password: hashedPass,
-            Image: req.body.Image,
-            Genre: req.body.Genre,
-            Date_Naissance: req.body.Date_Naissance,
-            Role: req.body.Role
+
       
         })
         user.save()
-        .then(user =>{
+        .then(async user =>{
+
+            let token = jwt.sign({uid:user._id},process.env.ACCESS_TOKEN_SECRET,{expiresIn:process.env.ACCESS_TOKEN_EXPIRE_TIME})
+            let refreshtoken = jwt.sign({uid:user._id},process.env.REFRESH_TOKEN_SECRET,{expiresIn:process.env.REFRESH_TOKEN_EXPIRE_TIME})
+
             res.json({
-                message: 'Utilisateur added successfully!'
+                msg: 'Utilisateur added successfully!',
+                user,
+                token,
+                refreshtoken
             })
         })
         .catch(error =>{
-            res.json({
-                message: 'An error occured!'
+            res.status(400).json({
+                msg: 'An error occured!'
             })
         })
     })   
@@ -48,23 +60,24 @@ const login =(req,res,next)=>{
                     })
                 }
                 if(result){
-                    let token = jwt.sign({name:user.Username},process.env.ACCESS_TOKEN_SECRET,{expiresIn:process.env.ACCESS_TOKEN_EXPIRE_TIME})
-                    let refreshtoken = jwt.sign({name:user.Username},process.env.REFRESH_TOKEN_SECRET,{expiresIn:process.env.REFRESH_TOKEN_EXPIRE_TIME})
+                    let token = jwt.sign({uid:user._id},process.env.ACCESS_TOKEN_SECRET,{expiresIn:process.env.ACCESS_TOKEN_EXPIRE_TIME})
+                    let refreshtoken = jwt.sign({uid:user._id},process.env.REFRESH_TOKEN_SECRET,{expiresIn:process.env.REFRESH_TOKEN_EXPIRE_TIME})
 
                     res.json({
-                        message:'Login Successful!',
+                        msg:'Login Successful!',
+                        user,
                         token,
                         refreshtoken
                     })
                 }else{
-                    res.json({
-                        message:'Password does not matched'
+                    res.status(400).json({
+                        msg:'Password does not matched'
                     })
                 }
             })
         }else{
-            res.json({
-                message: 'Utilisateur not found!'
+            res.status(400).json({
+                msg: 'Utilisateur not found!'
             })  
         }
     })
@@ -72,7 +85,7 @@ const login =(req,res,next)=>{
 
 const refreshToken = (req,res,next)=>{
     const refreshToken = req.body.refreshToken
-    jwt.verify(refreshToken,'refreshtokensecret',function(err,decode){
+    jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,function(err,decode){
         if(err){
             res.json({
                 err
@@ -80,14 +93,34 @@ const refreshToken = (req,res,next)=>{
         }else{
             let token = jwt.sign({name:decode.name},process.env.ACCESS_TOKEN_SECRET,{expiresIn:process.env.ACCESS_TOKEN_EXPIRE_TIME})
             let refreshToken=req.body.refreshToken
-            res.json({
-                message: 'Token Refreshed successfully!',
-                token,
-                refreshToken
-            })
+
+             User.findById(decode.uid).then(user=>{
+
+              if(user == null) return res.status(400).json({
+                msg: 'Utilisateur not found!'
+                })
+
+
+              return  res.json({
+                msg: 'Token Refreshed successfully!',
+                    user,
+                    token,
+                    refreshToken
+                })
+             }).catch(er=> res.status(400).json({
+                msg: 'Utilisateur not found!'
+            }))
+
+       
+
+           
         }
     })
 }
+
+
+
+
 module.exports={
     register,login,refreshToken
 }
