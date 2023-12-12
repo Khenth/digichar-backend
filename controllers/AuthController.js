@@ -92,7 +92,7 @@ const refreshToken = (req,res,next)=>{
             })
         }else{
             let token = jwt.sign({name:decode.name},process.env.ACCESS_TOKEN_SECRET,{expiresIn:process.env.ACCESS_TOKEN_EXPIRE_TIME})
-            let refreshToken=req.body.refreshToken
+            let refreshtoken=req.body.refreshToken
 
              User.findById(decode.uid).then(user=>{
 
@@ -105,7 +105,7 @@ const refreshToken = (req,res,next)=>{
                 msg: 'Token Refreshed successfully!',
                     user,
                     token,
-                    refreshToken
+                    refreshtoken
                 })
              }).catch(er=> res.status(400).json({
                 msg: 'Utilisateur not found!'

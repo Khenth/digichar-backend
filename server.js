@@ -34,4 +34,4 @@ app.listen(PORT, () => {
 
 app.use("/api/user", UserRoute);
 app.use("/api", AuthRoute);
-app.use("/api/interview", CharityRoute);
+app.use("/api/charity", CharityRoute);
