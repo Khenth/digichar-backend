@@ -13,7 +13,7 @@ const index = (req,res,next)=>{
     })
     .catch(error =>{
         res.json({
-            message: 'An error occured!'
+            msg: 'An error occured!'
         })
     })
 }
@@ -29,7 +29,7 @@ const show =(req,res,next)=>{
     })
     .catch(error =>{
         res.json({
-            message: 'An error occured!'
+            msg: 'An error occured!'
         })
     })
 }
@@ -58,12 +58,12 @@ const Add = (req,res,next)=>{
     user.save()
     .then(response =>{
         res.json({
-            message: 'User added successfully!'
+            msg: 'User added successfully!'
         })
     })
     .catch(error =>{
         res.json({
-            message: 'An error occured!'
+            msg: 'An error occured!'
         })
     })
 }
@@ -84,12 +84,12 @@ const update = (req,res,next)=>{
     User.findByIdAndUpdate(userId, {$set: updateData})
     .then(()=>{
         res.json({
-            message: 'User updated successfully!'
+            msg: 'User updated successfully!'
         })
     })
     .catch(error =>{
         res.json({
-            message: 'An error occured!'
+            msg: 'An error occured!'
         })
     })
 
@@ -102,12 +102,12 @@ const destroy = (req,res,next)=>{
     User.findByIdAndRemove(userId)
     .then(()=>{
         res.json({
-            message: 'User deleted successfully!'
+            msg: 'User deleted successfully!'
         })
     })
     .catch(error =>{
         res.json({
-            message: 'An error occured!'
+            msg: 'An error occured!'
         })
     })
 }

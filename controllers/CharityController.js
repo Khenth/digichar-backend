@@ -18,8 +18,8 @@ const index = (req, res, next) => {
       res.json(response);
     })
     .catch((error) => {
-      res.json({
-        message: "An error occurred!",
+      res.status(400).json({
+        msg: "An error occurred!",
       });
     });
 }
@@ -39,7 +39,11 @@ const show = (req, res) => {
         reponse: response.reponse,
       })
     );
-    })
+    }).catch((error) => {
+      res.status(400).json({
+        msg: "An error occured!",
+      });
+    });
     
 };
 
@@ -54,14 +58,15 @@ const Add = (req, res, next) => {
   });
   interview
     .save()
-    .then((response) => {
+    .then((data) => {
       res.json({
-        message: "interview added successfully!",
+        msg: "interview added successfully!",
+        data
       });
     })
     .catch((error) => {
-      res.json({
-        message: "An error occured!",
+      res.status(400).json({
+        msg: "An error occured!",
       });
     });
 };
@@ -76,14 +81,15 @@ const update = (req, res, next) => {
     reponse: req.body.reponse,
   };
   Charity.findByIdAndUpdate(interviewId, { $set: updateData })
-    .then(() => {
+    .then((data) => {
       res.json({
-        message: "interview updated successfully!",
+        msg: "interview updated successfully!",
+        data
       });
     })
     .catch((error) => {
-      res.json({
-        message: "An error occured!",
+      res.status(400).json({
+        msg: "An error occured!",
       });
     });
 };
@@ -94,12 +100,12 @@ const destroy = (req, res, next) => {
   Charity.findByIdAndRemove(interviewId)
     .then(() => {
       res.json({
-        message: "interview deleted successfully!",
+        msg: "interview deleted successfully!",
       });
     })
     .catch((error) => {
-      res.json({
-        message: "An error occured!",
+      res.status(400).json({
+        msg: "An error occured!",
       });
     });
 };

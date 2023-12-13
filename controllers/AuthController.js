@@ -21,9 +21,7 @@ const register =async (req,res,next)=>{
         let user = new User({
             Username: req.body.Username,
             Email: req.body.Email,
-            Password: hashedPass,
-
-      
+            Password: hashedPass
         })
         user.save()
         .then(async user =>{
